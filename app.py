@@ -10,14 +10,18 @@ def serve_front():
 
 @app.route('/calculate', methods=['POST'])
 def calculate():
-    data = request.get_json()
-    name = data.get('name')
-    income = float(data.get('income'))
-    debt = float(data.get('debt'))
-    experience = float(data.get('experience'))
-    result = calculate_risk(income, debt, experience)
-    return jsonify({"name": name, "risk": result})
+    try:
+        data = request.get_json()
+        name = data.get('name')
+        income = float(data.get('income'))
+        debt = float(data.get('debt'))
+        experience = float(data.get('experience'))
+        result = calculate_risk(income, debt, experience)
+        return jsonify({"name": name, "risk": result})
+    except Exception as e:
+        print("⚠️ Xəta baş verdi:", e)
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port, debug=True)
