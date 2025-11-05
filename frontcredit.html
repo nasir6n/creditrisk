@@ -125,11 +125,17 @@
       resultBox.textContent = "Calculating...";
 
       const data = {
-        name: document.getElementById('name').value,
-        income: document.getElementById('income').value,
-        debt: document.getElementById('debt').value,
-        experience: document.getElementById('experience').value
+        name: document.getElementById('name').value.trim(),
+        income: document.getElementById('income').value.trim(),
+        debt: document.getElementById('debt').value.trim(),
+        experience: document.getElementById('experience').value.trim()
       };
+
+      if (!data.name || !data.income || !data.debt || !data.experience) {
+        resultBox.textContent = "⚠️ Please fill in all fields.";
+        resultBox.classList.add('show');
+        return;
+      }
 
       try {
         const res = await fetch('/calculate', {
@@ -138,13 +144,21 @@
           body: JSON.stringify(data)
         });
 
+        if (!res.ok) throw new Error(`Server error ${res.status}`);
+
         const result = await res.json();
-        resultBox.textContent = `${result.name}, your risk level: ${result.risk}`;
-        resultBox.classList.add('show');
+
+        if (!result || !result.name || !result.risk) {
+          resultBox.textContent = "⚠️ Unable to calculate — check your inputs.";
+        } else {
+          resultBox.textContent = `${result.name}, your risk level: ${result.risk}`;
+        }
       } catch (err) {
-        resultBox.textContent = "Error: Unable to calculate.";
-        resultBox.classList.add('show');
+        console.error(err);
+        resultBox.textContent = "❌ Error: Unable to calculate (server or network issue).";
       }
+
+      resultBox.classList.add('show');
     }
   </script>
 </body>
