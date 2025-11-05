@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, jsonify, send_file
 from creditrisk import calculate_risk  # creditrisk.py-dakı funksiyanı çağırır
 
@@ -5,7 +6,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def serve_front():
-    return send_file('frontcredit.html')  # ön səhifəni göstərir
+    return send_file('frontcredit.html')
 
 @app.route('/calculate', methods=['POST'])
 def calculate():
@@ -14,9 +15,9 @@ def calculate():
     income = float(data.get('income'))
     debt = float(data.get('debt'))
     experience = float(data.get('experience'))
-
     result = calculate_risk(income, debt, experience)
     return jsonify({"name": name, "risk": result})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
