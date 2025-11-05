@@ -3,22 +3,127 @@
 <head>
   <meta charset="UTF-8">
   <title>Fuzzy Loan Risk Calculator</title>
+  <link rel="icon" href="https://alfacin.com/wp-content/uploads/2024/07/cropped-logopng-1-300x161.png">
   <style>
-    body { font-family: sans-serif; max-width: 500px; margin: 40px auto; }
-    input, button { width: 100%; padding: 8px; margin: 8px 0; }
+    * {
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #4a90e2, #9013fe);
+      background-size: 200% 200%;
+      animation: gradientShift 8s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.3);
+      padding: 40px 30px;
+      width: 90%;
+      max-width: 400px;
+      color: #fff;
+      text-align: center;
+      animation: fadeIn 0.7s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    img {
+      width: 120px;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 14px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 10px;
+      outline: none;
+      font-size: 15px;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: #fff;
+      color: #4a90e2;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #4a90e2;
+      color: #fff;
+      transform: scale(1.03);
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: 500;
+      min-height: 24px;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    #result.show {
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
-  <h2>Fuzzy Loan Risk Calculator</h2>
-  <input id="name" placeholder="Name">
-  <input id="income" placeholder="Monthly Income (AZN)">
-  <input id="debt" placeholder="Current Monthly Debt (AZN)">
-  <input id="experience" placeholder="Experience (months)">
-  <button onclick="calculate()">Calculate Risk</button>
-  <p id="result"></p>
+  <div class="card">
+    <img src="https://alfacin.com/wp-content/uploads/2024/07/cropped-logopng-1-300x161.png" alt="Logo">
+    <h2>Fuzzy Loan Risk Calculator</h2>
+
+    <input id="name" placeholder="Name">
+    <input id="income" placeholder="Monthly Income (AZN)" type="number">
+    <input id="debt" placeholder="Current Monthly Debt (AZN)" type="number">
+    <input id="experience" placeholder="Experience (months)" type="number">
+
+    <button onclick="calculate()">Calculate Risk</button>
+
+    <p id="result"></p>
+  </div>
 
   <script>
     async function calculate() {
+      const resultBox = document.getElementById('result');
+      resultBox.classList.remove('show');
+      resultBox.textContent = "Calculating...";
+
       const data = {
         name: document.getElementById('name').value,
         income: document.getElementById('income').value,
@@ -26,14 +131,20 @@
         experience: document.getElementById('experience').value
       };
 
-      const res = await fetch('/calculate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      const result = await res.json();
-      document.getElementById('result').textContent = 
-        `${result.name}, your result: ${result.risk}`;
+      try {
+        const res = await fetch('/calculate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+        resultBox.textContent = `${result.name}, your risk level: ${result.risk}`;
+        resultBox.classList.add('show');
+      } catch (err) {
+        resultBox.textContent = "Error: Unable to calculate.";
+        resultBox.classList.add('show');
+      }
     }
   </script>
 </body>
