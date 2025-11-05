@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fuzzy Loan Risk Calculator</title>
+  <style>
+    body { font-family: sans-serif; max-width: 500px; margin: 40px auto; }
+    input, button { width: 100%; padding: 8px; margin: 8px 0; }
+  </style>
+</head>
+<body>
+  <h2>Fuzzy Loan Risk Calculator</h2>
+  <input id="name" placeholder="Name">
+  <input id="income" placeholder="Monthly Income (AZN)">
+  <input id="debt" placeholder="Current Monthly Debt (AZN)">
+  <input id="experience" placeholder="Experience (months)">
+  <button onclick="calculate()">Calculate Risk</button>
+  <p id="result"></p>
+
+  <script>
+    async function calculate() {
+      const data = {
+        name: document.getElementById('name').value,
+        income: document.getElementById('income').value,
+        debt: document.getElementById('debt').value,
+        experience: document.getElementById('experience').value
+      };
+
+      const res = await fetch('/calculate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      document.getElementById('result').textContent = 
+        `${result.name}, your result: ${result.risk}`;
+    }
+  </script>
+</body>
+</html>
